@@ -5,12 +5,24 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse_lazy, reverse
 from django.views.generic import (
-    CreateView, DeleteView, DetailView, ListView, UpdateView, FormView,
+    CreateView, DeleteView, DetailView, ListView, UpdateView, FormView, TemplateView,
 )
 
 from .forms import AlbumForm, PhotoForm, RegisterForm
 from .mixins import AlbumOwnerOrAdminMixin, PhotoOwnerOrAdminMixin
 from .models import Album, Photo
+
+
+# ─── Homepage ────────────────────────────────────────────────────────────────
+
+class HomeView(TemplateView):
+    template_name = 'home.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        # Logged-in users skip the landing page and go straight to their albums
+        if request.user.is_authenticated:
+            return redirect('album_list')
+        return super().dispatch(request, *args, **kwargs)
 
 
 # ─── Auth ────────────────────────────────────────────────────────────────────

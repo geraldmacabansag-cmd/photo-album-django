@@ -2,11 +2,14 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+    # Homepage (public landing)
+    path('', views.HomeView.as_view(), name='home'),
+
     # Auth
     path('accounts/register/', views.RegisterView.as_view(), name='register'),
 
-    # Albums
-    path('', views.AlbumListView.as_view(), name='album_list'),
+    # Albums (dashboard)
+    path('albums/', views.AlbumListView.as_view(), name='album_list'),
     path('albums/create/', views.AlbumCreateView.as_view(), name='album_create'),
     path('albums/<int:pk>/', views.AlbumDetailView.as_view(), name='album_detail'),
     path('albums/<int:pk>/edit/', views.AlbumUpdateView.as_view(), name='album_edit'),

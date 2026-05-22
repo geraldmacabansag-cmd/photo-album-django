@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% block title %}Login – PhotoAlbum{% endblock %}
+{% block title %}Login – MomentBox{% endblock %}
 
 {% block content %}
 <div class="form-card" style="margin-top:3rem;">
@@ -23,6 +23,7 @@
 
   <p style="text-align:center;margin-top:1.5rem;color:var(--muted);font-size:.9rem;">
     No account? <a href="{% url 'register' %}" style="color:var(--primary);">Register here</a>
+    &nbsp;·&nbsp; <a href="{% url 'home' %}" style="color:var(--muted);">← Home</a>
   </p>
 </div>
 {% endblock %}

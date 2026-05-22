@@ -1,0 +1,378 @@
+{% extends 'base.html' %}
+{% block title %}MomentBox — Preserve Your Moments{% endblock %}
+
+{% block extra_head %}
+<style>
+  /* ── Hero ── */
+  .hero {
+    position: relative;
+    min-height: calc(100vh - 64px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    overflow: hidden;
+    margin: -2rem -1.5rem 0;
+    padding: 4rem 2rem;
+  }
+
+  /* animated gradient background */
+  .hero-bg {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% -10%, rgba(99,102,241,.35) 0%, transparent 70%),
+      radial-gradient(ellipse 60% 50% at 80% 80%, rgba(167,139,250,.2) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 40% at 10% 90%, rgba(99,102,241,.15) 0%, transparent 60%),
+      var(--bg);
+    z-index: 0;
+  }
+
+  /* floating dots */
+  .hero-dots {
+    position: absolute; inset: 0; z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .dot {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.18;
+    animation: float linear infinite;
+  }
+  @keyframes float {
+    from { transform: translateY(0) rotate(0deg); opacity: .18; }
+    50%  { opacity: .28; }
+    to   { transform: translateY(-120vh) rotate(360deg); opacity: 0; }
+  }
+
+  .hero-content { position: relative; z-index: 1; max-width: 760px; }
+
+  .hero-eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(99,102,241,.15);
+    border: 1px solid rgba(99,102,241,.35);
+    color: #a5b4fc;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 6px 16px;
+    border-radius: 999px;
+    margin-bottom: 2rem;
+  }
+
+  .hero-title {
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    font-weight: 900;
+    line-height: 1.08;
+    letter-spacing: -0.03em;
+    margin-bottom: 1.5rem;
+  }
+  .hero-title .gradient-word {
+    background: linear-gradient(90deg, #818cf8, #a78bfa, #c084fc);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-sub {
+    font-size: 1.15rem;
+    color: var(--muted);
+    line-height: 1.7;
+    max-width: 540px;
+    margin: 0 auto 3rem;
+  }
+
+  .hero-actions {
+    display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;
+    margin-bottom: 4rem;
+  }
+  .btn-hero-primary {
+    background: linear-gradient(135deg, #6366f1, #a78bfa);
+    color: #fff;
+    padding: 0.9rem 2.2rem;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 700;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    display: inline-flex; align-items: center; gap: 8px;
+    transition: opacity .15s, transform .15s;
+    box-shadow: 0 0 32px rgba(99,102,241,.4);
+  }
+  .btn-hero-primary:hover { opacity: .9; transform: translateY(-2px); }
+  .btn-hero-secondary {
+    background: transparent;
+    color: var(--text);
+    padding: 0.9rem 2rem;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    text-decoration: none;
+    border: 1px solid var(--border);
+    display: inline-flex; align-items: center; gap: 8px;
+    transition: border-color .15s, background .15s, transform .15s;
+  }
+  .btn-hero-secondary:hover { border-color: var(--primary); background: rgba(99,102,241,.08); transform: translateY(-2px); }
+
+  /* stat strip */
+  .hero-stats {
+    display: flex; gap: 2.5rem; justify-content: center; flex-wrap: wrap;
+  }
+  .stat { text-align: center; }
+  .stat-num { font-size: 1.6rem; font-weight: 800; color: var(--text); }
+  .stat-lbl { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+
+  /* ── Features ── */
+  .section { padding: 5rem 0; }
+  .section-label {
+    text-align: center;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: #818cf8;
+    margin-bottom: 1rem;
+  }
+  .section-title {
+    text-align: center;
+    font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin-bottom: 1rem;
+  }
+  .section-sub {
+    text-align: center;
+    color: var(--muted);
+    max-width: 520px;
+    margin: 0 auto 3.5rem;
+    line-height: 1.7;
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+    gap: 1.5rem;
+  }
+  .feature-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 2rem;
+    transition: transform .2s, box-shadow .2s, border-color .2s;
+  }
+  .feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0,0,0,.35);
+    border-color: rgba(99,102,241,.4);
+  }
+  .feature-icon {
+    width: 52px; height: 52px;
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.5rem;
+    margin-bottom: 1.2rem;
+  }
+  .fi-purple { background: rgba(99,102,241,.15); }
+  .fi-violet { background: rgba(167,139,250,.15); }
+  .fi-blue   { background: rgba(59,130,246,.15); }
+  .fi-pink   { background: rgba(236,72,153,.15); }
+  .fi-teal   { background: rgba(20,184,166,.15); }
+  .fi-amber  { background: rgba(245,158,11,.15); }
+  .feature-title { font-size: 1.05rem; font-weight: 700; margin-bottom: .5rem; }
+  .feature-desc  { font-size: .875rem; color: var(--muted); line-height: 1.65; }
+
+  /* ── How it works ── */
+  .steps-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    position: relative;
+  }
+  .step-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 2rem 1.5rem;
+    text-align: center;
+  }
+  .step-num-badge {
+    width: 44px; height: 44px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem; font-weight: 800; color: #fff;
+    margin: 0 auto 1.2rem;
+  }
+  .step-title { font-weight: 700; margin-bottom: .4rem; }
+  .step-desc  { font-size: .85rem; color: var(--muted); line-height: 1.6; }
+
+  /* ── CTA ── */
+  .cta-section {
+    margin: 0 -1.5rem;
+    padding: 5rem 2rem;
+    background: linear-gradient(135deg, rgba(99,102,241,.12), rgba(167,139,250,.08));
+    border-top: 1px solid rgba(99,102,241,.2);
+    border-bottom: 1px solid rgba(99,102,241,.2);
+    text-align: center;
+  }
+  .cta-section h2 { font-size: clamp(1.8rem,3.5vw,2.6rem); font-weight: 800; letter-spacing: -0.02em; margin-bottom: 1rem; }
+  .cta-section p  { color: var(--muted); margin-bottom: 2.5rem; max-width: 460px; margin-left:auto; margin-right:auto; line-height:1.7; }
+
+  /* ── Footer ── */
+  .site-footer {
+    text-align: center;
+    padding: 2.5rem 1.5rem;
+    color: var(--muted);
+    font-size: .82rem;
+    border-top: 1px solid var(--border);
+    margin: 0 -1.5rem -2rem;
+  }
+  .site-footer a { color: var(--muted); text-decoration: none; }
+  .site-footer a:hover { color: var(--text); }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- ═══════════════════════════ HERO ═══════════════════════════ -->
+<section class="hero">
+  <div class="hero-bg"></div>
+
+  <!-- floating particles -->
+  <div class="hero-dots">
+    <div class="dot" style="width:6px;height:6px;background:#6366f1;left:12%;bottom:-10px;animation-duration:18s;animation-delay:0s;"></div>
+    <div class="dot" style="width:4px;height:4px;background:#a78bfa;left:28%;bottom:-10px;animation-duration:22s;animation-delay:3s;"></div>
+    <div class="dot" style="width:8px;height:8px;background:#818cf8;left:55%;bottom:-10px;animation-duration:15s;animation-delay:1s;"></div>
+    <div class="dot" style="width:5px;height:5px;background:#c084fc;left:72%;bottom:-10px;animation-duration:20s;animation-delay:5s;"></div>
+    <div class="dot" style="width:4px;height:4px;background:#6366f1;left:88%;bottom:-10px;animation-duration:17s;animation-delay:2s;"></div>
+    <div class="dot" style="width:7px;height:7px;background:#a78bfa;left:40%;bottom:-10px;animation-duration:24s;animation-delay:7s;"></div>
+    <div class="dot" style="width:3px;height:3px;background:#818cf8;left:5%;bottom:-10px;animation-duration:19s;animation-delay:4s;"></div>
+    <div class="dot" style="width:6px;height:6px;background:#c084fc;left:95%;bottom:-10px;animation-duration:21s;animation-delay:6s;"></div>
+  </div>
+
+  <div class="hero-content">
+    <div class="hero-eyebrow">✨ Your personal photo album manager</div>
+
+    <h1 class="hero-title">
+      Every moment<br>
+      <span class="gradient-word">deserves a home.</span>
+    </h1>
+
+    <p class="hero-sub">
+      MomentBox helps you organize, store, and revisit your most cherished photos.
+      Create albums, upload memories, and keep them safe in the cloud — forever.
+    </p>
+
+    <div class="hero-actions">
+      <a href="{% url 'register' %}" class="btn-hero-primary">
+        📦 Start for free
+      </a>
+      <a href="{% url 'login' %}" class="btn-hero-secondary">
+        Sign in →
+      </a>
+    </div>
+
+    <div class="hero-stats">
+      <div class="stat">
+        <div class="stat-num">∞</div>
+        <div class="stat-lbl">Photos stored</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">100%</div>
+        <div class="stat-lbl">Cloud-backed</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">Free</div>
+        <div class="stat-lbl">To get started</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ FEATURES ═══════════════════════════ -->
+<section class="section">
+  <p class="section-label">Why MomentBox</p>
+  <h2 class="section-title">Everything you need to preserve your memories</h2>
+  <p class="section-sub">A simple, powerful platform built to keep your photos organized and accessible anywhere.</p>
+
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon fi-purple">📁</div>
+      <div class="feature-title">Album Organization</div>
+      <div class="feature-desc">Group photos into named albums with descriptions. Create as many albums as you need for every occasion, trip, or milestone.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon fi-violet">☁️</div>
+      <div class="feature-title">Cloud Storage</div>
+      <div class="feature-desc">All images are stored securely on Cloudinary's global CDN — fast to load from anywhere, never lost even if your device breaks.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon fi-blue">🔐</div>
+      <div class="feature-title">Private & Secure</div>
+      <div class="feature-desc">Your albums belong to you. Role-based access control ensures only you (and admins you trust) can ever see or edit your content.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon fi-pink">🖼️</div>
+      <div class="feature-title">Beautiful Gallery</div>
+      <div class="feature-desc">Browse your photos in a clean, responsive grid. Each album showcases a cover photo and photo count at a glance.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon fi-teal">⚡</div>
+      <div class="feature-title">Instant Uploads</div>
+      <div class="feature-desc">Upload photos in seconds. MomentBox handles compression and delivery automatically so your images always look great.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon fi-amber">🔍</div>
+      <div class="feature-title">Quick Search</div>
+      <div class="feature-desc">Find any album instantly by name or description. The more memories you store, the more useful search becomes.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ HOW IT WORKS ═══════════════════════════ -->
+<section class="section" style="padding-top:0;">
+  <p class="section-label">How it works</p>
+  <h2 class="section-title">Up and running in minutes</h2>
+  <p class="section-sub">Three simple steps to start preserving your memories in the cloud.</p>
+
+  <div class="steps-row">
+    <div class="step-card">
+      <div class="step-num-badge">1</div>
+      <div class="step-title">Create an account</div>
+      <div class="step-desc">Sign up for free in seconds. No credit card, no complicated setup — just a username and password.</div>
+    </div>
+    <div class="step-card">
+      <div class="step-num-badge">2</div>
+      <div class="step-title">Build your first album</div>
+      <div class="step-desc">Give your album a name, add a description, and it's ready to receive photos right away.</div>
+    </div>
+    <div class="step-card">
+      <div class="step-num-badge">3</div>
+      <div class="step-title">Upload & enjoy</div>
+      <div class="step-desc">Upload photos directly from your device. They're stored in the cloud and viewable from any browser, instantly.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ CTA ═══════════════════════════ -->
+<div class="cta-section">
+  <h2>Ready to box your moments?</h2>
+  <p>Join MomentBox today and give your photos the home they deserve. It's completely free to get started.</p>
+  <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
+    <a href="{% url 'register' %}" class="btn-hero-primary">Create your free account</a>
+    <a href="{% url 'login' %}" class="btn-hero-secondary">I already have an account</a>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ FOOTER ═══════════════════════════ -->
+<footer class="site-footer">
+  <p>
+    <strong style="color:var(--text);">MomentBox</strong>
+    &nbsp;·&nbsp; Preserve every moment, forever.
+    &nbsp;·&nbsp; Built with Django &amp; Cloudinary
+  </p>
+</footer>
+
+{% endblock %}
