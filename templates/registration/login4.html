@@ -15,19 +15,19 @@
     <form method="post">
       {% csrf_token %}
 
-      <div class="form-group" style="text-align:center;">
+      <div class="form-group">
         <label for="id_username" style="display:block;font-size:.85rem;color:var(--muted);margin-bottom:.4rem;">Username</label>
         <input type="text" name="username" id="id_username" autocomplete="username" required
                class="form-control"
-               style="width:70%;margin:0 auto;display:block;"
+               style="text-align:center;"
                placeholder="Enter your username">
       </div>
 
-      <div class="form-group" style="text-align:center;">
+      <div class="form-group">
         <label for="id_password" style="display:block;font-size:.85rem;color:var(--muted);margin-bottom:.4rem;">Password</label>
         <input type="password" name="password" id="id_password" autocomplete="current-password" required
                class="form-control"
-               style="width:70%;margin:0 auto;display:block;"
+               style="text-align:center;"
                placeholder="Enter your password">
       </div>
 
@@ -35,7 +35,7 @@
         <div class="alert alert-error">{{ form.non_field_errors }}</div>
       {% endif %}
 
-      <button type="submit" class="btn btn-primary" style="width:70%;margin:1rem auto 0;display:block;justify-content:center;padding:.8rem;">Sign in</button>
+      <button type="submit" class="btn btn-primary" style="width:100%;margin-top:1rem;justify-content:center;padding:.8rem;">Sign in</button>
     </form>
 
     <p style="text-align:center;margin-top:1.5rem;color:var(--muted);font-size:.875rem;">
