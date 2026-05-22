@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}PhotoAlbum{% endblock %}</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary:   #6366f1;
+      --primary-h: #4f46e5;
+      --danger:    #ef4444;
+      --danger-h:  #dc2626;
+      --success:   #22c55e;
+      --warning:   #f59e0b;
+      --bg:        #0f172a;
+      --surface:   #1e293b;
+      --surface2:  #334155;
+      --border:    #475569;
+      --text:      #f1f5f9;
+      --muted:     #94a3b8;
+      --radius:    10px;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── Nav ── */
+    nav {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .nav-brand {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--primary);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .nav-links { display: flex; align-items: center; gap: 1rem; }
+    .nav-links a, .nav-links form button {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0.4rem 0.75rem;
+      border-radius: 6px;
+      transition: color .15s, background .15s;
+    }
+    .nav-links a:hover, .nav-links form button:hover {
+      color: var(--text);
+      background: var(--surface2);
+    }
+    .nav-badge {
+      font-size: 0.7rem;
+      background: var(--primary);
+      color: #fff;
+      padding: 2px 6px;
+      border-radius: 999px;
+      margin-left: 4px;
+    }
+
+    /* ── Layout ── */
+    .page { max-width: 1200px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+    /* ── Messages ── */
+    .messages { margin-bottom: 1.5rem; }
+    .alert {
+      padding: 0.9rem 1.2rem;
+      border-radius: var(--radius);
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+      border-left: 4px solid;
+    }
+    .alert-success { background: #14532d33; border-color: var(--success); color: #86efac; }
+    .alert-error   { background: #7f1d1d33; border-color: var(--danger);  color: #fca5a5; }
+    .alert-warning { background: #78350f33; border-color: var(--warning); color: #fcd34d; }
+    .alert-info    { background: #1e3a5f33; border-color: var(--primary); color: #93c5fd; }
+
+    /* ── Forms ── */
+    .form-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem;
+      max-width: 520px;
+      margin: 0 auto;
+    }
+    .form-card h1 { font-size: 1.5rem; margin-bottom: 1.5rem; }
+    .form-group { margin-bottom: 1.2rem; }
+    .form-group label { display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 0.4rem; }
+    .form-control {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.65rem 0.9rem;
+      border-radius: 6px;
+      font-size: 0.95rem;
+      transition: border-color .15s;
+    }
+    .form-control:focus { outline: none; border-color: var(--primary); }
+    .form-control::placeholder { color: var(--muted); }
+    textarea.form-control { resize: vertical; }
+    .errorlist { list-style: none; color: #fca5a5; font-size: 0.82rem; margin-top: 0.3rem; }
+
+    /* ── Buttons ── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 0.65rem 1.25rem;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background .15s, transform .1s;
+    }
+    .btn:active { transform: scale(.97); }
+    .btn-primary   { background: var(--primary);   color: #fff; }
+    .btn-primary:hover { background: var(--primary-h); }
+    .btn-danger    { background: var(--danger);    color: #fff; }
+    .btn-danger:hover  { background: var(--danger-h);  }
+    .btn-ghost     { background: var(--surface2);  color: var(--text); }
+    .btn-ghost:hover   { background: var(--border); }
+    .btn-sm { padding: 0.4rem 0.85rem; font-size: 0.82rem; }
+
+    /* ── Grid / Cards ── */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      transition: transform .2s, box-shadow .2s;
+    }
+    .card:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(0,0,0,.4); }
+    .card-img { width: 100%; height: 200px; object-fit: cover; display: block; }
+    .card-img-placeholder {
+      width: 100%; height: 200px;
+      background: var(--surface2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 3rem; color: var(--muted);
+    }
+    .card-body { padding: 1.1rem; }
+    .card-title { font-size: 1.05rem; font-weight: 600; margin-bottom: 0.3rem; }
+    .card-meta { font-size: 0.8rem; color: var(--muted); }
+    .card-actions { display: flex; gap: 0.5rem; margin-top: 0.9rem; flex-wrap: wrap; }
+
+    /* ── Page header ── */
+    .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .page-header h1 { font-size: 1.8rem; }
+
+    /* ── Search bar ── */
+    .search-bar { display: flex; gap: 0.5rem; max-width: 400px; }
+    .search-bar input { flex: 1; }
+
+    /* ── Empty state ── */
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: var(--muted);
+    }
+    .empty-state .icon { font-size: 3.5rem; margin-bottom: 1rem; }
+    .empty-state p { margin-bottom: 1.5rem; }
+
+    /* ── Pagination ── */
+    .pagination {
+      display: flex; gap: 0.5rem; justify-content: center;
+      margin-top: 2.5rem; flex-wrap: wrap;
+    }
+    .page-link {
+      padding: 0.45rem 0.9rem;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      text-decoration: none;
+      font-size: 0.85rem;
+      transition: background .15s;
+    }
+    .page-link:hover, .page-link.active { background: var(--primary); border-color: var(--primary); }
+
+    /* ── Role badge ── */
+    .role-badge {
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .role-admin { background: #7c3aed22; color: #c4b5fd; border: 1px solid #7c3aed55; }
+    .role-user  { background: #0284c722; color: #7dd3fc; border: 1px solid #0284c755; }
+
+    /* ── Photo grid ── */
+    .photo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1rem;
+    }
+    .photo-card img {
+      width: 100%; height: 180px; object-fit: cover;
+      border-radius: var(--radius);
+      display: block;
+      transition: opacity .2s;
+    }
+    .photo-card img:hover { opacity: .85; }
+    .photo-card-body { padding: 0.6rem 0.2rem; }
+
+    /* ── Confirm delete ── */
+    .confirm-card {
+      max-width: 480px;
+      margin: 4rem auto;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-top: 4px solid var(--danger);
+      border-radius: var(--radius);
+      padding: 2.5rem;
+      text-align: center;
+    }
+    .confirm-card h2 { margin-bottom: 1rem; }
+    .confirm-card p { color: var(--muted); margin-bottom: 2rem; line-height: 1.6; }
+    .confirm-actions { display: flex; gap: 1rem; justify-content: center; }
+  </style>
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+<nav>
+  <a href="{% url 'album_list' %}" class="nav-brand">📷 PhotoAlbum</a>
+  <div class="nav-links">
+    {% if user.is_authenticated %}
+      <span style="color:var(--muted); font-size:.85rem;">
+        {{ user.username }}
+        {% if user.is_staff %}<span class="role-badge role-admin">Admin</span>
+        {% else %}<span class="role-badge role-user">User</span>{% endif %}
+      </span>
+      <a href="{% url 'album_list' %}">My Albums</a>
+      <a href="{% url 'album_create' %}">+ New Album</a>
+      {% if user.is_staff %}<a href="{% url 'admin:index' %}">Admin Panel</a>{% endif %}
+      <form method="post" action="{% url 'logout' %}">
+        {% csrf_token %}
+        <button type="submit">Logout</button>
+      </form>
+    {% else %}
+      <a href="{% url 'login' %}">Login</a>
+      <a href="{% url 'register' %}" style="background:var(--primary);color:#fff;padding:.4rem .9rem;border-radius:6px;">Register</a>
+    {% endif %}
+  </div>
+</nav>
+
+<div class="page">
+  {% if messages %}
+    <div class="messages">
+      {% for msg in messages %}
+        <div class="alert alert-{{ msg.tags }}">{{ msg }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  {% block content %}{% endblock %}
+</div>
+
+</body>
+</html>

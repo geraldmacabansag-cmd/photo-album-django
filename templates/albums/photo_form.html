@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}{{ action }} Photo – PhotoAlbum{% endblock %}
+
+{% block content %}
+<div class="form-card" style="margin-top:2rem;">
+  <h1>{{ action }} Photo</h1>
+  <p style="color:var(--muted);margin-bottom:1.5rem;">
+    Album: <a href="{% url 'album_detail' album.pk %}" style="color:var(--primary);">{{ album.name }}</a>
+  </p>
+
+  {% if object and object.image %}
+  <div style="margin-bottom:1.5rem;">
+    <p style="font-size:.85rem;color:var(--muted);margin-bottom:.5rem;">Current image:</p>
+    <img src="{{ object.image.url }}" alt="{{ object.title }}"
+         style="width:100%;max-height:200px;object-fit:cover;border-radius:var(--radius);">
+  </div>
+  {% endif %}
+
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {% for field in form %}
+      <div class="form-group">
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.errors %}<ul class="errorlist">{% for e in field.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+      </div>
+    {% endfor %}
+
+    <div style="display:flex;gap:.75rem;margin-top:1.5rem;">
+      <button type="submit" class="btn btn-primary">{{ action }} Photo</button>
+      <a href="{% url 'album_detail' album.pk %}" class="btn btn-ghost">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

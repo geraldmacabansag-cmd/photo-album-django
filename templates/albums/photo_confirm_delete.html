@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}Delete Photo – PhotoAlbum{% endblock %}
+
+{% block content %}
+<div class="confirm-card">
+  <h2>Delete Photo?</h2>
+  {% if photo.image %}
+    <img src="{{ photo.image.url }}" alt="{{ photo.title }}"
+         style="width:100%;max-height:180px;object-fit:cover;border-radius:var(--radius);margin-bottom:1.5rem;">
+  {% endif %}
+  <p>
+    You are about to permanently delete <strong>"{{ photo.title }}"</strong>.
+    The image will also be removed from Cloudinary storage. This cannot be undone.
+  </p>
+  <div class="confirm-actions">
+    <form method="post">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger">Yes, Delete</button>
+    </form>
+    <a href="{% url 'album_detail' photo.album.pk %}" class="btn btn-ghost">Cancel</a>
+  </div>
+</div>
+{% endblock %}

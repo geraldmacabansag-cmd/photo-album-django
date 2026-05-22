@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block title %}{{ album.name }} – PhotoAlbum{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>{{ album.name }}</h1>
+    <p style="color:var(--muted);margin-top:.3rem;">
+      {{ album.photo_count }} photo{{ album.photo_count|pluralize }}
+      {% if request.user.is_staff %}&bull; Owner: {{ album.owner.username }}{% endif %}
+      &bull; Created {{ album.created_at|date:"M j, Y" }}
+    </p>
+    {% if album.description %}
+      <p style="margin-top:.5rem;color:var(--muted);max-width:600px;">{{ album.description }}</p>
+    {% endif %}
+  </div>
+  <div style="display:flex;gap:.75rem;flex-wrap:wrap;">
+    {% if is_owner %}
+      <a href="{% url 'photo_upload' album.pk %}" class="btn btn-primary">＋ Upload Photo</a>
+      <a href="{% url 'album_edit' album.pk %}" class="btn btn-ghost">Edit Album</a>
+      <a href="{% url 'album_delete' album.pk %}" class="btn btn-danger">Delete Album</a>
+    {% endif %}
+    <a href="{% url 'album_list' %}" class="btn btn-ghost">← Back</a>
+  </div>
+</div>
+
+{% with photos=album.photos.all %}
+{% if photos %}
+  <div class="photo-grid">
+    {% for photo in photos %}
+    <div class="photo-card card" style="padding:0;overflow:hidden;">
+      <img src="{{ photo.image.url }}" alt="{{ photo.title }}" loading="lazy" style="border-radius:var(--radius) var(--radius) 0 0;">
+      <div class="photo-card-body" style="padding:.8rem 1rem;">
+        <div style="font-weight:600;font-size:.95rem;">{{ photo.title }}</div>
+        {% if photo.description %}
+          <div style="font-size:.8rem;color:var(--muted);margin-top:.2rem;">{{ photo.description|truncatewords:10 }}</div>
+        {% endif %}
+        <div style="font-size:.75rem;color:var(--muted);margin-top:.3rem;">
+          By {{ photo.uploader.username }} &bull; {{ photo.uploaded_at|date:"M j, Y" }}
+        </div>
+        {% if request.user.is_staff or photo.uploader == request.user %}
+        <div style="display:flex;gap:.4rem;margin-top:.6rem;">
+          <a href="{% url 'photo_edit' photo.pk %}" class="btn btn-ghost btn-sm">Edit</a>
+          <a href="{% url 'photo_delete' photo.pk %}" class="btn btn-danger btn-sm">Delete</a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="empty-state">
+    <div class="icon">📷</div>
+    <p>This album has no photos yet.</p>
+    {% if is_owner %}
+      <a href="{% url 'photo_upload' album.pk %}" class="btn btn-primary">Upload the first photo</a>
+    {% endif %}
+  </div>
+{% endif %}
+{% endwith %}
+{% endblock %}

@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% block title %}My Albums – PhotoAlbum{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>
+      {% if request.user.is_staff %}All Albums{% else %}My Albums{% endif %}
+    </h1>
+    <p style="color:var(--muted);margin-top:.3rem;">
+      {{ page_obj.paginator.count }} album{{ page_obj.paginator.count|pluralize }}
+    </p>
+  </div>
+  <div style="display:flex;gap:.75rem;flex-wrap:wrap;align-items:center;">
+    <form class="search-bar" method="get">
+      <input type="text" name="q" value="{{ query }}" placeholder="Search albums…" class="form-control">
+      <button type="submit" class="btn btn-ghost">Search</button>
+      {% if query %}<a href="{% url 'album_list' %}" class="btn btn-ghost">✕</a>{% endif %}
+    </form>
+    <a href="{% url 'album_create' %}" class="btn btn-primary">＋ New Album</a>
+  </div>
+</div>
+
+{% if albums %}
+  <div class="grid">
+    {% for album in albums %}
+    <div class="card">
+      {% with cover=album.cover_photo %}
+        {% if cover %}
+          <a href="{% url 'album_detail' album.pk %}">
+            <img src="{{ cover.image.url }}" class="card-img" alt="{{ album.name }}">
+          </a>
+        {% else %}
+          <a href="{% url 'album_detail' album.pk %}" class="card-img-placeholder">🖼</a>
+        {% endif %}
+      {% endwith %}
+      <div class="card-body">
+        <div class="card-title">
+          <a href="{% url 'album_detail' album.pk %}" style="color:var(--text);text-decoration:none;">{{ album.name }}</a>
+        </div>
+        <div class="card-meta">
+          {% if request.user.is_staff %}Owner: {{ album.owner.username }} &bull; {% endif %}
+          {{ album.photo_count }} photo{{ album.photo_count|pluralize }} &bull;
+          {{ album.created_at|date:"M j, Y" }}
+        </div>
+        {% if album.description %}
+          <p style="font-size:.85rem;color:var(--muted);margin-top:.5rem;">{{ album.description|truncatewords:12 }}</p>
+        {% endif %}
+        <div class="card-actions">
+          <a href="{% url 'album_detail' album.pk %}" class="btn btn-ghost btn-sm">View</a>
+          {% if request.user.is_staff or album.owner == request.user %}
+            <a href="{% url 'album_edit' album.pk %}" class="btn btn-ghost btn-sm">Edit</a>
+            <a href="{% url 'album_delete' album.pk %}" class="btn btn-danger btn-sm">Delete</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  {% if is_paginated %}
+  <div class="pagination">
+    {% if page_obj.has_previous %}
+      <a href="?page=1{% if query %}&q={{ query }}{% endif %}" class="page-link">&laquo;</a>
+      <a href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}" class="page-link">‹</a>
+    {% endif %}
+    <span class="page-link active">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}
+      <a href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}" class="page-link">›</a>
+      <a href="?page={{ page_obj.paginator.num_pages }}{% if query %}&q={{ query }}{% endif %}" class="page-link">&raquo;</a>
+    {% endif %}
+  </div>
+  {% endif %}
+
+{% else %}
+  <div class="empty-state">
+    <div class="icon">📁</div>
+    <p>{% if query %}No albums matching "{{ query }}".{% else %}You haven't created any albums yet.{% endif %}</p>
+    {% if not query %}
+      <a href="{% url 'album_create' %}" class="btn btn-primary">Create your first album</a>
+    {% endif %}
+  </div>
+{% endif %}
+{% endblock %}
