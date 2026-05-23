@@ -2,10 +2,7 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    # Homepage (public landing)
     path('', views.HomeView.as_view(), name='home'),
-
-    # Auth
     path('accounts/register/', views.RegisterView.as_view(), name='register'),
 
     # Albums (dashboard)
